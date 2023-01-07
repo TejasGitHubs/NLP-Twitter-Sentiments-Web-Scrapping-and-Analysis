@@ -1,0 +1,99 @@
+---
+title: "Sentiment"
+author: "Jyothi Movva"
+date: "Nov'22"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r}
+apple <- read.csv("C:/Users/himad/Downloads/tweets14.csv", header = T)
+str(apple)
+```
+```{r}
+library(tm)
+corpus <- iconv(apple$full_text)
+corpus <- Corpus(VectorSource(corpus))
+inspect(corpus[1:5])
+```
+```{r}
+corpus <- tm_map(corpus, tolower)
+inspect(corpus[1:5])
+```
+```{r}
+corpus <- tm_map(corpus, removePunctuation)
+inspect(corpus[1:5])
+```
+```{r}
+corpus <- tm_map(corpus, removeNumbers)
+inspect(corpus[1:5])
+```
+
+```{r}
+removeURL <- function(x) gsub('http[[:alnum:]]*', '', x)
+cleanset <- tm_map(corpus, content_transformer(removeURL))
+inspect(cleanset[1:5])
+```
+```{r}
+stopwords()
+stopwords('english')
+stopwords = c(stopwords('english'),'appl','daili','can','iphone','â€','â','iphon','pro','take','new','got','max','phone','will','aapl','just','appl','get','via')
+cleanset = tm_map(cleanset, removeWords, stopwords)
+cleanset = tm_map(cleanset, stemDocument)
+frequencies = DocumentTermMatrix(cleanset)
+sparse = removeSparseTerms(frequencies, 0.995)
+tSparse = as.data.frame(as.matrix(sparse))
+colnames(tSparse) = make.names(colnames(tSparse))
+inspect(cleanset[1:10])
+```
+
+```{r}
+library(syuzhet)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(reshape2)
+library(dplyr)
+apple14 <- read.csv("C:/Users/himad/Downloads/tweets14.csv", header = T)
+tweets <- iconv(apple14$full_text)
+s <- get_nrc_sentiment(tweets)
+head(s)
+barplot(colSums(s),
+        las = 2,
+        col = rainbow(10),
+        ylab = 'Count',
+        main = 'Sentiment Scores Tweets')
+```
+```{r}
+
+apple13 <- read.csv("C:/Users/himad/Downloads/tweetsiphone13.csv", header = T)
+tweets <- iconv(apple13$full_text)
+s <- get_nrc_sentiment(tweets)
+barplot(colSums(s),
+        las = 2,
+        col = rainbow(10),
+        ylab = 'Count',
+        main = 'Sentiment Scores Tweets')
+```
+
+
+
+```{r}
+
+apple12 <- read.csv("C:/Users/himad/Downloads/tweets_12.csv", header = T)
+tweets <- iconv(apple12$full_text)
+s <- get_nrc_sentiment(tweets)
+head(s)
+barplot(colSums(s),
+        las = 2,
+        col = rainbow(10),
+        ylab = 'Count',
+        main = 'Sentiment Scores Tweets')
+```
+
